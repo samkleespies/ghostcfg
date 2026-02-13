@@ -1,0 +1,1 @@
+"""ghostcfg widgets."""

@@ -1,0 +1,21 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "ghostcfg"
+version = "0.1.0"
+description = "Interactive TUI for Ghostty terminal configuration"
+readme = "README.md"
+requires-python = ">=3.10"
+license = "MIT"
+dependencies = [
+    "textual>=1.0.0",
+]
+
+[project.scripts]
+ghostcfg = "ghostcfg.app:main"
+gcfg = "ghostcfg.app:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/ghostcfg"]

@@ -1,0 +1,241 @@
+/* ghostcfg — Textual CSS */
+
+Screen {
+    background: $surface;
+}
+
+/* ── Theme Browser ──────────────────────────────────────── */
+
+#theme-container {
+    height: 1fr;
+    padding: 1;
+}
+
+#theme-search {
+    dock: top;
+    margin-bottom: 1;
+}
+
+#theme-list {
+    height: 1fr;
+}
+
+#theme-count {
+    dock: bottom;
+    text-align: center;
+    color: $text-muted;
+    padding: 1 0 0 0;
+}
+
+/* ── Config Panel ───────────────────────────────────────── */
+
+.config-panel {
+    height: 1fr;
+}
+
+.options-scroll {
+    height: 1fr;
+    padding: 1;
+}
+
+.doc-pane {
+    height: auto;
+    max-height: 8;
+    padding: 1 2;
+    background: $boost;
+    color: $text;
+    overflow-y: auto;
+}
+
+/* ── Option Row ─────────────────────────────────────────── */
+
+OptionRow {
+    height: 4;
+    border-bottom: solid $primary 50%;
+}
+
+.option-row {
+    height: 3;
+    padding: 0 1;
+    align: left middle;
+}
+
+
+.option-row {
+    height: 3;
+    padding: 0 1;
+    align: left middle;
+}
+
+.option-label {
+    width: 32;
+    padding: 1 1 0 0;
+    color: $text;
+}
+
+.option-widget {
+    width: 1fr;
+    max-width: 40;
+}
+
+.color-input-row {
+    width: 1fr;
+    height: auto;
+    align: left middle;
+}
+
+.color-input {
+    width: 1fr;
+}
+
+.color-swatch {
+    width: 2;
+    min-width: 2;
+    height: 1;
+    min-height: 1;
+    max-height: 1;
+    padding: 0;
+    margin: 1 0 0 1;
+    border: none;
+    background: white;
+}
+
+.color-swatch:focus {
+    text-style: none;
+}
+
+.color-swatch > .button--label {
+    width: 0;
+    height: 0;
+    display: none;
+}
+
+/* ── Color Picker ──────────────────────────────────────── */
+
+ColorPickerScreen {
+    align: center middle;
+}
+
+#color-picker-dialog {
+    width: 60;
+    height: auto;
+    max-height: 90%;
+    padding: 1 2;
+    background: $surface;
+    border: round $accent;
+    align: center top;
+}
+
+#picker-title {
+    text-align: center;
+    text-style: bold;
+    width: 48;
+    margin-bottom: 1;
+}
+
+#color-preview {
+    height: 2;
+    width: 48;
+    margin-bottom: 0;
+}
+
+#color-preview-hex {
+    text-align: center;
+    width: 48;
+    margin-bottom: 1;
+}
+
+#sb-grid {
+    width: 48;
+    height: auto;
+    margin: 0 0 1 0;
+}
+
+.sb-row {
+    height: 1;
+    width: 48;
+}
+
+.sb-cell {
+    width: 2;
+    height: 1;
+    margin: 0;
+    padding: 0;
+}
+
+#hue-bar {
+    height: 1;
+    width: 48;
+    margin: 0 0 1 0;
+}
+
+.hue-cell {
+    width: 2;
+    height: 1;
+    margin: 0;
+    padding: 0;
+}
+
+#picker-hex-row {
+    height: 3;
+    align: left middle;
+    width: auto;
+}
+
+#picker-hex-label {
+    width: auto;
+    padding: 1 1 0 0;
+}
+
+#picker-hex-input {
+    width: 20;
+}
+
+#picker-footer {
+    height: auto;
+    width: auto;
+}
+
+#picker-hint {
+    text-align: center;
+    color: $text-muted;
+}
+
+/* ── Help Screen ────────────────────────────────────────── */
+
+HelpScreen {
+    align: center middle;
+}
+
+#help-dialog {
+    width: 60;
+    height: auto;
+    max-height: 80%;
+    padding: 2 3;
+    background: $surface;
+    border: round $accent;
+}
+
+#help-text {
+    width: 1fr;
+}
+
+/* ── Tabs ───────────────────────────────────────────────── */
+
+TabbedContent {
+    height: 1fr;
+}
+
+TabPane {
+    padding: 0;
+}
+
+/* ── Widget sizing ──────────────────────────────────────── */
+
+ThemeBrowser {
+    height: 1fr;
+}
+
+ConfigPanel {
+    height: 1fr;
+}
