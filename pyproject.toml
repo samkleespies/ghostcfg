@@ -9,9 +9,33 @@ description = "Interactive TUI for Ghostty terminal configuration"
 readme = "README.md"
 requires-python = ">=3.10"
 license = "MIT"
+authors = [
+    { name = "Sam Kleespies", email = "samkleespies@gmail.com" },
+]
+keywords = ["ghostty", "terminal", "config", "tui", "textual"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: MacOS",
+    "Operating System :: POSIX :: Linux",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Terminals :: Terminal Emulators/X Terminals",
+    "Topic :: Utilities",
+]
 dependencies = [
     "textual>=1.0.0",
 ]
+
+[project.urls]
+Homepage = "https://github.com/samkleespies/ghostcfg"
+Repository = "https://github.com/samkleespies/ghostcfg"
+Issues = "https://github.com/samkleespies/ghostcfg/issues"
 
 [project.scripts]
 ghostcfg = "ghostcfg.app:main"

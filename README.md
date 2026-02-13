@@ -11,7 +11,15 @@ Browse 200+ options by category, preview themes live with color swatches, and sa
 ## Install
 
 ```bash
-pip install ghostcfg
+pipx install ghostcfg        # recommended
+uv tool install ghostcfg     # or with uv
+pip install ghostcfg          # or plain pip
+```
+
+On macOS with Homebrew:
+
+```bash
+brew install samkleespies/ghostcfg/ghostcfg
 ```
 
 Or from source:
