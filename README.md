@@ -4,6 +4,10 @@ A TUI for editing your [Ghostty](https://ghostty.org) config without touching th
 
 Browse 200+ options by category, preview themes live with color swatches, and save — ghostcfg hot-reloads your running Ghostty instance automatically.
 
+<p align="center">
+  <img src="assets/demo.gif" alt="ghostcfg demo" width="800">
+</p>
+
 ## Install
 
 ```bash
