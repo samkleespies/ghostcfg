@@ -4,12 +4,15 @@ from __future__ import annotations
 
 from textual.app import ComposeResult
 from textual.binding import Binding
-from textual.containers import Vertical
+from textual.containers import Horizontal, Vertical
 from textual.message import Message
 from textual.reactive import reactive
 from textual.widget import Widget
 from textual.widgets import Input, Label, OptionList
 from textual.widgets.option_list import Option
+
+from ghostcfg.ghostty import parse_theme_file
+from ghostcfg.widgets.theme_preview import ThemePreview
 
 
 class ThemeBrowser(Widget):
@@ -51,10 +54,12 @@ class ThemeBrowser(Widget):
         self._original_theme: str | None = None
 
     def compose(self) -> ComposeResult:
-        with Vertical(id="theme-container"):
-            yield Input(placeholder="Search themes...", id="theme-search")
-            yield OptionList(id="theme-list")
-            yield Label("", id="theme-count")
+        with Horizontal(id="theme-container"):
+            with Vertical(id="theme-list-panel"):
+                yield Input(placeholder="Search themes...", id="theme-search")
+                yield OptionList(id="theme-list")
+                yield Label("", id="theme-count")
+            yield ThemePreview(id="theme-preview")
 
     def set_original_theme(self, theme: str) -> None:
         """Set the theme to revert to on Escape."""
@@ -124,6 +129,12 @@ class ThemeBrowser(Widget):
         if event.option is not None:
             theme = str(event.option.prompt)
             self.post_message(self.ThemeHighlighted(theme))
+            preview = self.query_one("#theme-preview", ThemePreview)
+            palette = parse_theme_file(theme)
+            if palette is not None:
+                preview.show_theme(theme, palette)
+            else:
+                preview.clear_preview()
 
     def on_option_list_option_selected(self, event: OptionList.OptionSelected) -> None:
         if event.option is not None:

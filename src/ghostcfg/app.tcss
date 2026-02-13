@@ -11,6 +11,10 @@ Screen {
     padding: 1;
 }
 
+#theme-list-panel {
+    width: 1fr;
+}
+
 #theme-search {
     dock: top;
     margin-bottom: 1;
@@ -25,6 +29,13 @@ Screen {
     text-align: center;
     color: $text-muted;
     padding: 1 0 0 0;
+}
+
+#theme-preview {
+    width: 1fr;
+    max-width: 50;
+    padding: 1 2;
+    border-left: solid $primary 50%;
 }
 
 /* ── Config Panel ───────────────────────────────────────── */

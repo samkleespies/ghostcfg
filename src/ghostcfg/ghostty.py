@@ -6,7 +6,93 @@ import os
 import platform
 import signal
 import subprocess
+from dataclasses import dataclass, field
+from functools import lru_cache
 from pathlib import Path
+
+
+@dataclass
+class ThemePalette:
+    """Parsed color palette from a Ghostty theme file."""
+
+    background: str = "#000000"
+    foreground: str = "#ffffff"
+    cursor_color: str = ""
+    selection_background: str = ""
+    ansi: list[str] = field(default_factory=lambda: [""] * 16)
+
+
+def get_theme_dirs() -> list[Path]:
+    """Return theme search directories in priority order."""
+    dirs: list[Path] = []
+    if platform.system() == "Darwin":
+        dirs.append(
+            Path.home()
+            / "Library"
+            / "Application Support"
+            / "com.mitchellh.ghostty"
+            / "themes"
+        )
+        dirs.append(
+            Path("/Applications/Ghostty.app/Contents/Resources/ghostty/themes")
+        )
+    else:
+        xdg = os.environ.get("XDG_CONFIG_HOME", str(Path.home() / ".config"))
+        dirs.append(Path(xdg) / "ghostty" / "themes")
+        dirs.append(Path("/usr/share/ghostty/themes"))
+        dirs.append(Path("/usr/local/share/ghostty/themes"))
+    return dirs
+
+
+def get_theme_file(name: str) -> Path | None:
+    """Search theme directories for a file matching the given theme name."""
+    for d in get_theme_dirs():
+        candidate = d / name
+        if candidate.is_file():
+            return candidate
+    return None
+
+
+@lru_cache(maxsize=128)
+def parse_theme_file(name: str) -> ThemePalette | None:
+    """Parse a Ghostty theme file and return its palette, or None if not found."""
+    path = get_theme_file(name)
+    if path is None:
+        return None
+    try:
+        text = path.read_text(encoding="utf-8")
+    except OSError:
+        return None
+
+    palette = ThemePalette()
+    for line in text.splitlines():
+        line = line.strip()
+        if not line or line.startswith("#"):
+            continue
+        if "=" not in line:
+            continue
+        key, _, value = line.partition("=")
+        key = key.strip()
+        value = value.strip()
+        if key == "background":
+            palette.background = value
+        elif key == "foreground":
+            palette.foreground = value
+        elif key == "cursor-color":
+            palette.cursor_color = value
+        elif key == "selection-background":
+            palette.selection_background = value
+        elif key == "palette":
+            # Format: "index=color" e.g. "0=#1d1f21"
+            if "=" in value:
+                idx_str, _, color = value.partition("=")
+                try:
+                    idx = int(idx_str)
+                    if 0 <= idx <= 15:
+                        palette.ansi[idx] = color
+                except ValueError:
+                    pass
+    return palette
 
 
 def get_config_path() -> Path:
