@@ -28,7 +28,7 @@ pip install ghostcfg
 Or install from source:
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/ghostcfg.git
+git clone https://github.com/samkleespies/ghostcfg.git
 cd ghostcfg
 pip install -e .
 ```
