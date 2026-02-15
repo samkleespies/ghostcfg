@@ -116,10 +116,12 @@ def list_themes() -> list[str]:
         )
         themes = []
         for line in result.stdout.strip().splitlines():
-            # Format: "Theme Name (resources)" or just "Theme Name"
+            # Format: "Theme Name (resources)" or "Theme Name (user)"
             name = line.strip()
-            if name.endswith("(resources)"):
-                name = name[: -len("(resources)")].strip()
+            for suffix in ("(resources)", "(user)"):
+                if name.endswith(suffix):
+                    name = name[: -len(suffix)].strip()
+                    break
             if name:
                 themes.append(name)
         return themes
@@ -128,14 +130,14 @@ def list_themes() -> list[str]:
 
 
 def get_config_with_docs() -> dict[str, dict]:
-    """Run ghostty +show-config --default --docs and parse into structured dict.
+    """Run ghostty +show-config --docs and parse into structured dict.
 
     Returns dict of {option_name: {"value": str, "doc": str}}.
     Repeatable options (like palette, keybind) collect all values into a list.
     """
     try:
         result = subprocess.run(
-            ["ghostty", "+show-config", "--default", "--docs"],
+            ["ghostty", "+show-config", "--docs"],
             capture_output=True,
             text=True,
             timeout=10,
