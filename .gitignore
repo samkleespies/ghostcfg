@@ -27,3 +27,6 @@ htmlcov/
 
 # ghostcfg backups
 *.bak.*
+
+# Claude Code
+CLAUDE.md

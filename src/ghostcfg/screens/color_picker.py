@@ -10,7 +10,7 @@ from textual.binding import Binding
 from textual.color import Color
 from textual.containers import Horizontal, Vertical
 from textual.screen import ModalScreen
-from textual.widgets import Input, Label, Static
+from textual.widgets import Button, Input, Label, Static
 
 SB_COLS = 24
 SB_ROWS = 12
@@ -111,7 +111,9 @@ class ColorPickerScreen(ModalScreen[str]):
                     id="picker-hex-input",
                 )
             with Horizontal(id="picker-footer"):
-                yield Label("[Enter] Select  [Escape] Cancel", id="picker-hint")
+                yield Button("Select", id="picker-select-btn", variant="primary")
+                yield Button("Cancel", id="picker-cancel-btn")
+            yield Label("Enter to select, Escape to cancel", id="picker-hint")
 
     def on_mount(self) -> None:
         self._update_preview(self._current_color)
@@ -196,6 +198,12 @@ class ColorPickerScreen(ModalScreen[str]):
                 self._highlight_hue_cell()
             except Exception:
                 pass
+
+    def on_button_pressed(self, event: Button.Pressed) -> None:
+        if event.button.id == "picker-select-btn":
+            self.dismiss(self._current_color)
+        elif event.button.id == "picker-cancel-btn":
+            self.dismiss("")
 
     def action_confirm(self) -> None:
         self.dismiss(self._current_color)

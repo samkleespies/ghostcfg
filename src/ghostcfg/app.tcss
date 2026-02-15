@@ -128,7 +128,7 @@ ColorPickerScreen {
 }
 
 #color-picker-dialog {
-    width: 60;
+    width: 54;
     height: auto;
     max-height: 90%;
     padding: 1 2;
@@ -140,31 +140,31 @@ ColorPickerScreen {
 #picker-title {
     text-align: center;
     text-style: bold;
-    width: 48;
+    width: 1fr;
     margin-bottom: 1;
 }
 
 #color-preview {
     height: 2;
-    width: 48;
+    width: 1fr;
     margin-bottom: 0;
 }
 
 #color-preview-hex {
     text-align: center;
-    width: 48;
+    width: 1fr;
     margin-bottom: 1;
 }
 
 #sb-grid {
-    width: 48;
+    width: 1fr;
     height: auto;
     margin: 0 0 1 0;
 }
 
 .sb-row {
     height: 1;
-    width: 48;
+    width: 1fr;
 }
 
 .sb-cell {
@@ -176,7 +176,7 @@ ColorPickerScreen {
 
 #hue-bar {
     height: 1;
-    width: 48;
+    width: 1fr;
     margin: 0 0 1 0;
 }
 
@@ -189,8 +189,8 @@ ColorPickerScreen {
 
 #picker-hex-row {
     height: 3;
-    align: left middle;
-    width: auto;
+    align: center middle;
+    width: 1fr;
 }
 
 #picker-hex-label {
@@ -204,12 +204,21 @@ ColorPickerScreen {
 
 #picker-footer {
     height: auto;
-    width: auto;
+    width: 1fr;
+    align: center middle;
+    margin-top: 1;
+}
+
+#picker-footer Button {
+    margin: 0 1;
+    min-width: 12;
 }
 
 #picker-hint {
     text-align: center;
+    width: 1fr;
     color: $text-muted;
+    margin-top: 1;
 }
 
 /* ── Help Screen ────────────────────────────────────────── */
