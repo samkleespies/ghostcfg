@@ -43,3 +43,54 @@ jobs:
       - uses: softprops/action-gh-release@v2
         with:
           generate_release_notes: true
+
+  homebrew:
+    needs: publish
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Extract version from tag
+        id: version
+        run: echo "version=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+      - name: Wait for PyPI availability
+        run: |
+          for i in $(seq 1 30); do
+            if curl -sf "https://pypi.org/pypi/ghostcfg/${{ steps.version.outputs.version }}/json" > /dev/null; then
+              echo "Package available on PyPI"
+              exit 0
+            fi
+            echo "Waiting for PyPI... ($i/30)"
+            sleep 10
+          done
+          echo "Timed out waiting for PyPI"
+          exit 1
+      - name: Get PyPI tarball SHA256
+        id: pypi
+        run: |
+          json=$(curl -sf "https://pypi.org/pypi/ghostcfg/${{ steps.version.outputs.version }}/json")
+          url=$(echo "$json" | python3 -c "import sys,json; d=json.load(sys.stdin); print([u['url'] for u in d['urls'] if u['packagetype']=='sdist'][0])")
+          sha=$(echo "$json" | python3 -c "import sys,json; d=json.load(sys.stdin); print([u['digests']['sha256'] for u in d['urls'] if u['packagetype']=='sdist'][0])")
+          echo "url=$url" >> "$GITHUB_OUTPUT"
+          echo "sha256=$sha" >> "$GITHUB_OUTPUT"
+      - name: Update Homebrew formula
+        env:
+          GH_TOKEN: ${{ secrets.HOMEBREW_TAP_TOKEN }}
+        run: |
+          git clone "https://x-access-token:${GH_TOKEN}@github.com/samkleespies/homebrew-ghostcfg.git" tap
+          cd tap
+          python3 -c "
+          import re
+          f = 'Formula/ghostcfg.rb'
+          text = open(f).read()
+          # Replace only the top-level url/sha256 (before first 'resource' block)
+          split = text.split('resource ', 1)
+          header = split[0]
+          header = re.sub(r'url \".*?\"', 'url \"${{ steps.pypi.outputs.url }}\"', header, count=1)
+          header = re.sub(r'sha256 \".*?\"', 'sha256 \"${{ steps.pypi.outputs.sha256 }}\"', header, count=1)
+          open(f, 'w').write(header + ('resource ' + split[1] if len(split) > 1 else ''))
+          "
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add Formula/ghostcfg.rb
+          git commit -m "Update ghostcfg to ${{ steps.version.outputs.version }}"
+          git push
