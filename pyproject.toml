@@ -29,7 +29,7 @@ classifiers = [
     "Topic :: Utilities",
 ]
 dependencies = [
-    "textual>=1.0.0",
+    "textual>=8.0.0,<9.0.0",
 ]
 
 [project.urls]

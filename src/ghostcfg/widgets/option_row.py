@@ -110,7 +110,7 @@ class OptionRow(Widget):
                     options,
                     value=self.current_value
                     if self.current_value in values
-                    else Select.BLANK,
+                    else Select.NULL,
                     id=f"opt-{self.key}",
                     classes="option-widget",
                     allow_blank=True,
@@ -144,7 +144,7 @@ class OptionRow(Widget):
                 options = [(f, f) for f in fonts]
                 yield Select(
                     options,
-                    value=self.current_value if self.current_value in fonts else Select.BLANK,
+                    value=self.current_value if self.current_value in fonts else Select.NULL,
                     id=f"opt-{self.key}",
                     classes="option-widget",
                     allow_blank=True,
@@ -166,7 +166,7 @@ class OptionRow(Widget):
         self._notify_change()
 
     def on_select_changed(self, event: Select.Changed) -> None:
-        new_val = str(event.value) if event.value != Select.BLANK else ""
+        new_val = str(event.value) if event.value is not Select.NULL else ""
         self.current_value = new_val
         self._notify_change()
 
@@ -223,11 +223,11 @@ class OptionRow(Widget):
             elif opt_type == "enum":
                 widget = self.query_one(f"#opt-{self.key}", Select)
                 values = self.meta.get("values", [])
-                widget.value = default if default in values else Select.BLANK
+                widget.value = default if default in values else Select.NULL
             elif self.key in FONT_KEYS:
                 widget = self.query_one(f"#opt-{self.key}", Select)
                 fonts = get_fonts()
-                widget.value = default if default in fonts else Select.BLANK
+                widget.value = default if default in fonts else Select.NULL
             else:
                 widget = self.query_one(f"#opt-{self.key}", Input)
                 widget.value = default
