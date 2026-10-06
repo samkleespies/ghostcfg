@@ -96,13 +96,24 @@ def parse_theme_file(name: str) -> ThemePalette | None:
 
 
 def get_config_path() -> Path:
-    """Detect the Ghostty config file path based on platform."""
+    """Choose the existing config loaded last by Ghostty, or a modern default.
+
+    Ghostty loads XDG files first, then macOS Application Support files.
+    Within each directory the legacy ``config`` is loaded after ``config.ghostty``.
+    See https://ghostty.org/docs/config#file-location.
+    """
+    xdg = os.environ.get("XDG_CONFIG_HOME") or str(Path.home() / ".config")
+    directories = [Path(xdg) / "ghostty"]
     if platform.system() == "Darwin":
-        p = Path.home() / "Library" / "Application Support" / "com.mitchellh.ghostty" / "config"
-    else:
-        xdg = os.environ.get("XDG_CONFIG_HOME", str(Path.home() / ".config"))
-        p = Path(xdg) / "ghostty" / "config"
-    return p
+        directories.append(
+            Path.home() / "Library" / "Application Support" / "com.mitchellh.ghostty"
+        )
+    candidates = [directory / name for directory in directories
+                  for name in ("config.ghostty", "config")]
+    for candidate in reversed(candidates):
+        if candidate.is_file():
+            return candidate
+    return directories[-1] / "config.ghostty"
 
 
 def list_themes() -> list[str]:
