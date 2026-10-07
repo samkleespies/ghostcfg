@@ -14,5 +14,8 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python }}
-      - run: python -m pip install -e . pytest pytest-asyncio
+      - run: python -m pip install build pytest pytest-asyncio
+      - run: python -m build
+      - run: python -m pip install dist/*.whl
+      - run: python -m pip check
       - run: python -m pytest -q

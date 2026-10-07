@@ -49,7 +49,7 @@ jobs:
 
   homebrew:
     needs: publish
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
       - name: Extract version from tag
@@ -75,11 +75,14 @@ jobs:
           sha=$(echo "$json" | python3 -c "import sys,json; d=json.load(sys.stdin); print([u['digests']['sha256'] for u in d['urls'] if u['packagetype']=='sdist'][0])")
           echo "url=$url" >> "$GITHUB_OUTPUT"
           echo "sha256=$sha" >> "$GITHUB_OUTPUT"
+      - name: Check out Homebrew tap
+        uses: actions/checkout@v4
+        with:
+          repository: samkleespies/homebrew-ghostcfg
+          token: ${{ secrets.HOMEBREW_TAP_TOKEN }}
+          path: tap
       - name: Update Homebrew formula
-        env:
-          GH_TOKEN: ${{ secrets.HOMEBREW_TAP_TOKEN }}
         run: |
-          git clone "https://x-access-token:${GH_TOKEN}@github.com/samkleespies/homebrew-ghostcfg.git" tap
           cd tap
           python3 -c "
           import re
@@ -92,6 +95,13 @@ jobs:
           header = re.sub(r'sha256 \".*?\"', 'sha256 \"${{ steps.pypi.outputs.sha256 }}\"', header, count=1)
           open(f, 'w').write(header + ('resource ' + split[1] if len(split) > 1 else ''))
           "
+          # Resource versions must follow the newly published package's requirements.
+          # Updating only the top-level URL leaves Textual 7 pinned for Textual 8 code.
+          brew update-python-resources "$PWD/Formula/ghostcfg.rb" --install-dependencies --ignore-main-package-cooldown
+          brew tap samkleespies/ghostcfg
+          cp Formula/ghostcfg.rb "$(brew --repository samkleespies/ghostcfg)/Formula/ghostcfg.rb"
+          brew install --build-from-source samkleespies/ghostcfg/ghostcfg
+          "$(brew --prefix ghostcfg)/libexec/bin/python" -m pip check
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add Formula/ghostcfg.rb
