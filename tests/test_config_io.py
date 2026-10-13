@@ -52,6 +52,15 @@ def test_set_new_value():
     assert len(config.entries) == 2
 
 
+def test_set_duplicate_option_changes_effective_value_after_roundtrip():
+    config = parse_config("font-size = 12\n# Later override\nfont-size = 14\n")
+    config.set("font-size", "18")
+
+    saved = config.to_text()
+    assert saved == "font-size = 12\n# Later override\nfont-size = 18\n"
+    assert parse_config(saved).get("font-size") == "18"
+
+
 def test_remove_value():
     config = parse_config("font-size = 14\ntheme = Dracula")
     config.remove("theme")
