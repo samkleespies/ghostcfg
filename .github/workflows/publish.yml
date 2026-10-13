@@ -58,6 +58,7 @@ jobs:
     needs: publish
     if: always() && (needs.publish.result == 'success' || github.event_name == 'workflow_dispatch')
     runs-on: macos-latest
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
       - name: Extract version from tag
@@ -109,7 +110,11 @@ jobs:
           header = split[0]
           header = re.sub(r'url \".*?\"', 'url \"${{ steps.pypi.outputs.url }}\"', header, count=1)
           header = re.sub(r'sha256 \".*?\"', 'sha256 \"${{ steps.pypi.outputs.sha256 }}\"', header, count=1)
-          open(f, 'w').write(header + ('resource ' + split[1] if len(split) > 1 else ''))
+          text = header + ('resource ' + split[1] if len(split) > 1 else '')
+          # Keep unrelated packages from Homebrew's base Python out of the app.
+          text = text.replace('    virtualenv_install_with_resources\\n',
+                              '    virtualenv_install_with_resources system_site_packages: false\\n')
+          open(f, 'w').write(text)
           "
           # Resource versions must follow the newly published package's requirements.
           # Updating only the top-level URL leaves Textual 7 pinned for Textual 8 code.
@@ -118,7 +123,9 @@ jobs:
           cp Formula/ghostcfg.rb "$tap_formula"
           brew update-python-resources samkleespies/ghostcfg/ghostcfg --install-dependencies --ignore-main-package-cooldown
           brew install --build-from-source samkleespies/ghostcfg/ghostcfg
-          "$(brew --prefix ghostcfg)/libexec/bin/python" -m pip check
+          ghostcfg_python="$(brew --prefix ghostcfg)/libexec/bin/python"
+          "$(brew --prefix python@3.12)/bin/python3.12" -m pip --python="$ghostcfg_python" check
+          "$ghostcfg_python" -c "from ghostcfg.app import GhostCfg; from ghostcfg.config_io import GhosttyConfig"
           cp "$tap_formula" Formula/ghostcfg.rb
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
