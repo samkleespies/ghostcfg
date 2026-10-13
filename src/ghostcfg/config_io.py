@@ -40,8 +40,8 @@ class GhosttyConfig:
         return [e.value for e in self.entries if e.kind == "option" and e.key == key]
 
     def set(self, key: str, value: str) -> None:
-        """Set an option value. Updates existing entry or appends new one."""
-        for entry in self.entries:
+        """Set the effective (last) option value or append a new entry."""
+        for entry in reversed(self.entries):
             if entry.kind == "option" and entry.key == key:
                 entry.value = value
                 return
