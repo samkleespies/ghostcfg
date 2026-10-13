@@ -4,12 +4,19 @@ permissions:
 name: Publish to PyPI
 
 on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Published PyPI version to repair in Homebrew (e.g. 0.1.4)"
+        required: true
+        type: string
   push:
     tags:
       - "v*"
 
 jobs:
   build:
+    if: github.event_name == 'push'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -49,12 +56,21 @@ jobs:
 
   homebrew:
     needs: publish
+    if: always() && (needs.publish.result == 'success' || github.event_name == 'workflow_dispatch')
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
       - name: Extract version from tag
         id: version
-        run: echo "version=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+        env:
+          REQUESTED_VERSION: ${{ inputs.version }}
+        run: |
+          version="${REQUESTED_VERSION:-${GITHUB_REF_NAME#v}}"
+          if [[ ! "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Expected a stable version such as 0.1.4"
+            exit 1
+          fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"
       - name: Wait for PyPI availability
         run: |
           for i in $(seq 1 30); do
@@ -97,13 +113,17 @@ jobs:
           "
           # Resource versions must follow the newly published package's requirements.
           # Updating only the top-level URL leaves Textual 7 pinned for Textual 8 code.
-          brew update-python-resources "$PWD/Formula/ghostcfg.rb" --install-dependencies --ignore-main-package-cooldown
           brew tap samkleespies/ghostcfg
-          cp Formula/ghostcfg.rb "$(brew --repository samkleespies/ghostcfg)/Formula/ghostcfg.rb"
+          tap_formula="$(brew --repository samkleespies/ghostcfg)/Formula/ghostcfg.rb"
+          cp Formula/ghostcfg.rb "$tap_formula"
+          brew update-python-resources samkleespies/ghostcfg/ghostcfg --install-dependencies --ignore-main-package-cooldown
           brew install --build-from-source samkleespies/ghostcfg/ghostcfg
           "$(brew --prefix ghostcfg)/libexec/bin/python" -m pip check
+          cp "$tap_formula" Formula/ghostcfg.rb
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add Formula/ghostcfg.rb
-          git commit -m "Update ghostcfg to ${{ steps.version.outputs.version }}"
-          git push
+          if ! git diff --cached --quiet; then
+            git commit -m "Update ghostcfg to ${{ steps.version.outputs.version }}"
+            git push
+          fi
